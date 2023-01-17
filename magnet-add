@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# transmission add magnet link from browser
+
+# if script is run without arguments exit
+[ $# -gt 0 ] || exit
+
+# transmission add magnet link
+transmission-remote --add "$@"
