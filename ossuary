@@ -17,7 +17,7 @@ IFS=$'\t\n' #change ifs seperator from spaces to new line
 
 # luks container variables
 loop=$(losetup -f)
-lukscontainer="/home/djwilcox/Documents/superfly.iso"
+lukscontainer="/home/djwilcox/Documents/mydata/disks/superfly.iso"
 luks=luks
 luksmapper="/dev/mapper/luks"
 mountpoint="/home/djwilcox/mnt"
