@@ -13,7 +13,7 @@ PASS=$(tr -dc '[:alnum:]' < /dev/urandom | fold -w ${PASSWORD_LENGTH} | head -n1
 SALT=$(tr -dc '[:alnum:]./' < /dev/urandom | fold -w 8 | head -n1)
 
 # Combine password + salt and use sha1sum to create the hash.
-HASH=$(echo -n ${PASS}${SALT} | sha1sum | awk '{print $1}')
+HASH=$(echo "${PASS}${SALT}" | sha1sum | awk '{print $1}')
 
 # Print the plain text password.
 echo "plain_text_password = ${PASS}"
