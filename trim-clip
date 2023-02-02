@@ -4,6 +4,8 @@
 # trim video or audio clip
 #===============================================================================
 
+# dependencies:
+# ffmpeg file
 
 #===============================================================================
 # script usage
@@ -85,8 +87,8 @@ infile_name="${infile_nopath%.*}"
 # infile file extension
 infile_ext="${infile##*.}"
 
-# xdg-mime command check input file mime type
-filetype="$(xdg-mime query filetype "${infile}")"
+# file command check input file mime type
+filetype="$(file --mime-type -b "${infile}")"
 
 # video mimetypes
 mov_mime='video/quicktime'

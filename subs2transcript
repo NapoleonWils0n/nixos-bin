@@ -1,8 +1,16 @@
 #!/bin/sh
 
+#===============================================================================
 # convert subtitles to a transcript
+#===============================================================================
 
+# dependencies:
+# awk sed fmt
+
+#===============================================================================
 # script usage
+#===============================================================================
+
 usage()
 {
 echo "\
@@ -12,18 +20,29 @@ $(basename "$0") -i infile.(srt|vtt)"
 exit 2
 }
 
+
+#===============================================================================
 # error messages
+#===============================================================================
+
 NOTFILE_ERR='not a file'
 INVALID_OPT_ERR='Invalid option:'
 REQ_ARG_ERR='requires an argument'
 WRONG_ARGS_ERR='wrong number of arguments passed to script'
 FILE_EXT_ERR='has the wrong file extension'
 
-# if script is run arguments pass and check the options with getopts,
-# else display script usage and exit
+
+#===============================================================================
+# check number of aruments passed to script
+#===============================================================================
+
 [ $# -gt 0 ] || usage "${WRONG_ARGS_ERR}"
 
-# getopts check and validate options
+
+#===============================================================================
+# getopts check options passed to script
+#===============================================================================
+
 while getopts ':i:o:h' opt
 do
   case ${opt} in
@@ -37,6 +56,11 @@ do
 done
 shift $((OPTIND-1))
 
+
+#===============================================================================
+# variables
+#===============================================================================
+
 # infile, infile name and extension
 infile_nopath="${infile##*/}"
 infile_name="${infile_nopath%.*}"
@@ -48,6 +72,11 @@ vtt='[Vv][Tt][Tt]'
 
 # outfile file recording destination
 outfile_default="${infile_name}-transcript-$(date +"%Y-%m-%d-%H-%M-%S").txt"
+
+
+#===============================================================================
+# functions
+#===============================================================================
 
 # srt subs
 srt_subs () {

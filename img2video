@@ -1,6 +1,15 @@
 #!/bin/sh
 
+#===============================================================================
 # image to video
+#===============================================================================
+
+# dependencies:
+# ffmpeg
+
+#===============================================================================
+# script usage
+#===============================================================================
 
 # script usage
 usage()
@@ -15,15 +24,27 @@ $(basename "$0") -i infile.(png|jpg|jpeg) -d (000) -o outfile.mp4
 exit 2
 }
 
+
+#===============================================================================
 # error messages
+#===============================================================================
+
 NOTFILE_ERR='not a file'
 INVALID_OPT_ERR='Invalid option:'
 REQ_ARG_ERR='requires an argument'
 WRONG_ARGS_ERR='wrong number of arguments passed to script'
 
-# if script is run arguments pass and check the options with getopts,
-# else display script usage and exit
+
+#===============================================================================
+# check number of aruments passed to script
+#===============================================================================
+
 [ $# -gt 0 ] || usage "${WRONG_ARGS_ERR}"
+
+
+#===============================================================================
+# getopts check options passed to script
+#===============================================================================
 
 # duration regex match 0.[1-9]
 dur_regex='^[0-9]\{1,3\}$'
@@ -44,12 +65,22 @@ do
 done
 shift $((OPTIND-1))
 
+
+#===============================================================================
+# variables
+#===============================================================================
+
 # infile, infile name and extension
 infile_nopath="${infile##*/}"
 infile_name="${infile_nopath%.*}"
 
 # outfile file recording destination
 outfile_default="${infile_name}-video-$(date +"%Y-%m-%d-%H-%M-%S").mp4"
+
+
+#===============================================================================
+# functions
+#===============================================================================
 
 # image to video function
 imgtovid () {
