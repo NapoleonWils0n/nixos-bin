@@ -24,7 +24,6 @@ NOTFILE_ERR='not a file'
 INVALID_OPT_ERR='Invalid option:'
 REQ_ARG_ERR='requires an argument'
 WRONG_ARGS_ERR='wrong number of arguments passed to script'
-NOT_MEDIA_FILE_ERR='is not a media file'
 
 # if script is run arguments pass and check the options with getopts,
 # else display script usage and exit
@@ -54,28 +53,6 @@ shift $((OPTIND-1))
 # infile, infile name and extension
 clip1_nopath="${clip1##*/}"
 clip1_name="${clip1_nopath%.*}"
-
-# file command check input file mime type
-clip1_filetype="$(file --mime-type -b "${clip1}")"
-clip2_filetype="$(file --mime-type -b "${clip2}")"
-
-# audio and video mimetypes
-mov_mime='video/quicktime'
-mkv_mime='video/x-matroska'
-mp4_mime='video/mp4'
-m4v_mime='video/x-m4v'
-
-# check the clips mime type
-checkmime () {
-case "${1}" in
-    ${mov_mime}|${mkv_mime}|${mp4_mime}|${m4v_mime});;
-    *) usage "${2} ${NOT_MEDIA_FILE_ERR}";;
-esac
-}
-
-# check mime type
-checkmime "${clip1_filetype}" "${clip1}"
-checkmime "${clip2_filetype}" "${clip2}"
 
 # clip durations for fades
 clip1_dur=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$clip1" | cut -d\. -f1)
