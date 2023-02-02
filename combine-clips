@@ -52,9 +52,9 @@ infile_name="${infile_nopath%.*}"
 # audio file extension
 audio_ext="${audio##*.}"
 
-# file command check input file mime type
-infile_filetype="$(file --mime-type -b "${infile}")"
-audio_filetype="$(file --mime-type -b "${audio}")"
+# xdg-mime command check input file mime type
+infile_filetype="$(xdg-mime query filetype "${infile}")"
+audio_filetype="$(xdg-mime query filetype "${audio}")"
 
 # audio and video mimetypes
 mov_mime='video/quicktime'
@@ -142,7 +142,7 @@ record_img_copy () {
 
 # image - audio isnt aac, encode audio as aac
 record_img_aac () {
-  ffmpeg \
+  ffmpeg -y \
   -hide_banner \
   -stats -v panic \
   -loop 1 \
