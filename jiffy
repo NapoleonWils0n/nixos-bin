@@ -27,7 +27,6 @@ NOTFILE_ERR='not a file'
 INVALID_OPT_ERR='Invalid option:'
 REQ_ARG_ERR='requires an argument'
 WRONG_ARGS_ERR='wrong number of arguments passed to script'
-NOT_MEDIA_FILE_ERR='is not a media file'
 
 # if script is run arguments pass and check the options with getopts,
 # else display script usage and exit
@@ -64,15 +63,6 @@ shift $((OPTIND-1))
 infile_nopath="${infile##*/}"
 infile_name="${infile_nopath%.*}"
 
-# file command check input file mime type
-filetype="$(file --mime-type -b "${infile}")"
-
-# video mimetypes
-mov_mime='video/quicktime'
-mkv_mime='video/x-matroska'
-mp4_mime='video/mp4'
-m4v_mime='video/x-m4v'
-
 # defaults for variables if not defined
 start_default='00:00:00'
 end_default=$(ffprobe -v error -sexagesimal -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$infile" | cut -d\. -f1)
@@ -92,8 +82,5 @@ create_gif () {
     "${outfile:=${outfile_default}}"
 }
 
-# check the files mime type
-case "${filetype}" in
-    ${mov_mime}|${mkv_mime}|${mp4_mime}|${m4v_mime}) create_gif "${infile}";;
-    *) usage "${infile} ${NOT_MEDIA_FILE_ERR}";;
-esac
+# run the create_gif function
+create_gif "${infile}"

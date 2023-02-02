@@ -20,7 +20,6 @@ NOTFILE_ERR='not a file'
 INVALID_OPT_ERR='Invalid option:'
 REQ_ARG_ERR='requires an argument'
 WRONG_ARGS_ERR='wrong number of arguments passed to script'
-NOT_MEDIA_FILE_ERR='is not a media file'
 
 # if script is run arguments pass and check the options with getopts,
 # else display script usage and exit
@@ -52,13 +51,6 @@ infile_name="${infile_nopath%.*}"
 # outfile file recording destination
 outfile_default="${infile_name}-video-$(date +"%Y-%m-%d-%H-%M-%S").mp4"
 
-# file command check input file mime type
-filetype="$(file --mime-type -b "${infile}")"
-
-# image mimetypes
-png_mime='image/png'
-jpg_mime='image/jpeg'
-
 # image to video function
 imgtovid () {
   ffmpeg \
@@ -72,8 +64,5 @@ imgtovid () {
   "${outfile:=${outfile_default}}"
 }
 
-# check the files mime type is a image
-case "${filetype}" in
-    ${png_mime}|${jpg_mime}) imgtovid "${infile}";;
-    *) usage "${infile} ${NOT_MEDIA_FILE_ERR}";;
-esac
+# run the imgtovid function
+imgtovid "${infile}"

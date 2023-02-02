@@ -67,13 +67,6 @@ shift $((OPTIND-1))
 infile_nopath="${infile##*/}"
 infile_name="${infile_nopath%.*}"
 
-# file command check input file mime type
-filetype="$(file --mime-type -b "${infile}")"
-
-# image mimetypes
-png_mime='image/png'
-jpg_mime='image/jpeg'
-
 # ffprobe get image height
 imgheight="$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=nw=1:nk=1 "${infile}")"
 
@@ -155,12 +148,6 @@ scale=-2:${imgheight}" \
 
 # outfile file recording destination
 outfile_default="${infile_name}-zoompan-$(date +"%Y-%m-%d-%H-%M-%S").mp4"
-
-# check the files mime type is a image
-case "${filetype}" in
-    ${png_mime}|${jpg_mime});;
-    *) { echo "${infile} ${NOT_MEDIA_FILE_ERR}" && usage; };;
-esac
 
 ### zoom function
 zoom_func () {

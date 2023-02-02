@@ -11,7 +11,7 @@ input=$(printf "%s\n" "$@")
 # mpd and taskspooler
 audio() {
     printf "%s\n" "${input}" | \
-    while read line
+    while read -r line
     do
       tsp pinch -i "${line}" 1>/dev/null 
     done
@@ -20,7 +20,7 @@ audio() {
 # download with yt-dlp
 download() {
     printf "%s\n" "${input}" | \
-    while read line
+    while read -r line
     do
       ts \
       yt-dlp \
@@ -35,7 +35,7 @@ download() {
 # download with yt-dlp with sponsorblock to remove sponsor
 sponsorblock_download() {
     printf "%s\n" "${input}" | \
-    while read line
+    while read -r line
     do
       ts \
       yt-dlp \
@@ -50,7 +50,7 @@ sponsorblock_download() {
 # mpv fullscreen on second display and taskspooler
 fullscreen() {
     printf "%s\n" "${input}" | \
-    while read line
+    while read -r line
     do
       ts mpv --fs --screen=1 "${line}" 1>/dev/null 
     done
@@ -59,7 +59,7 @@ fullscreen() {
 # mpv and taskspooler
 video() {
     printf "%s\n" "${input}" | \
-    while read line
+    while read -r line
     do
       ts mpv --no-terminal "${line}" 1>/dev/null
     done

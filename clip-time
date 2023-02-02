@@ -121,4 +121,3 @@ elif [ ! -z "${seconds}" ]; then
 else 
     usage
 fi
-

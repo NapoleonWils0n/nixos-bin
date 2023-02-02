@@ -18,7 +18,6 @@ INVALID_OPT_ERR='Invalid option:'
 REQ_ARG_ERR='requires an argument'
 WRONG_ARGS_ERR='wrong number of arguments passed to script'
 FILE_EXT_ERR='has the wrong file extension'
-NOT_TEXT_FILE_ERR='is not a text file'
 
 # if script is run arguments pass and check the options with getopts,
 # else display script usage and exit
@@ -46,18 +45,6 @@ infile_ext="${infile##*.}"
 # text file regular expressions for case statement
 srt='[Ss][Rr][Tt]'
 vtt='[Vv][Tt][Tt]'
-
-# file command check input file mime type
-infile_check="$(file --mime-type -b "${infile}")"
-
-# text mimetype
-subs_mime='text/plain'
-
-# check the text file mime type is a text
-case "${infile_check}" in
-    ${subs_mime});;
-    *) usage "${infile_check} ${NOT_TEXT_FILE_ERR}";;
-esac
 
 # outfile file recording destination
 outfile_default="${infile_name}-transcript-$(date +"%Y-%m-%d-%H-%M-%S").txt"

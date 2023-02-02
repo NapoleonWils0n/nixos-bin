@@ -32,7 +32,6 @@ NOTFILE_ERR='not a file'
 INVALID_OPT_ERR='Invalid option:'
 REQ_ARG_ERR='requires an argument'
 WRONG_ARGS_ERR='wrong number of arguments passed to script'
-NOT_MEDIA_FILE_ERR='is not a media file'
 
 # if script is run arguments pass and check the options with getopts,
 # else display script usage and exit
@@ -92,16 +91,6 @@ shift $((OPTIND-1))
 video_nopath="${video##*/}"
 video_name="${video_nopath%.*}"
 
-# file command check input file mime type
-video_filetype="$(file --mime-type -b "${video}")"
-overlay_filetype="$(file --mime-type -b "${overlay}")"
-
-# audio and video mimetypes
-mov_mime='video/quicktime'
-mkv_mime='video/x-matroska'
-mp4_mime='video/mp4'
-m4v_mime='video/x-m4v'
-
 # defaults for variables if not defined
 outfile_default="${video_name}-pip-$(date +"%Y-%m-%d-%H-%M-%S").mp4"
 
@@ -126,12 +115,6 @@ overlay_video () {
   -f mp4 \
   "${outfile:=${outfile_default}}"
 }
-
-# check the overlay mime type
-case "${overlay_filetype}" in
-    ${mov_mime}|${mkv_mime}|${mp4_mime}|${m4v_mime});;
-    *) usage "${overlay} ${NOT_MEDIA_FILE_ERR}";;
-esac
 
 # get overlay videos duration with ffprobe
 duration="$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${overlay}" | cut -d\. -f1)"
@@ -187,8 +170,5 @@ case "${pip}" in
     *) pip="${tr}";;
 esac
 
-# check the video mime type and run overlay function
-case "${video_filetype}" in
-    ${mov_mime}|${mkv_mime}|${mp4_mime}|${m4v_mime}) overlay_video "${video}" "${overlay}";;
-    *) usage "${video} ${NOT_MEDIA_FILE_ERR}";;
-esac
+# run the overlay_video function
+overlay_video "${video}" "${overlay}"

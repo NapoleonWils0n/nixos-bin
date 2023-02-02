@@ -16,7 +16,7 @@ if [ "${input}" = "" ]; then exit; fi
 # main trd function
 trd() {
     printf "%s\n" "${input}" | \
-    while read line
+    while read -r line
     do
       transmission-remote -t"${line}" "${1}" ;
     done
@@ -26,7 +26,7 @@ trd() {
 # get files from torrent
 get_files() {
     printf "%s\n" "${input}" | \
-    while read line
+    while read -r line
     do
 	selection=$(transmission-remote -t"${line}" --info-files \
 		| fzf --multi --info=inline --layout=reverse --header-lines=2 --delimiter='\n' --prompt='Select Files: ' \
@@ -39,7 +39,7 @@ get_files() {
 # dont get files from torrent
 noget_files() {
     printf "%s\n" "${input}" | \
-    while read line
+    while read -r line
     do
 	selection=$(transmission-remote -t"${line}" --info-files \
 		| fzf --multi --info=inline --layout=reverse --header-lines=2 --delimiter='\n' --prompt='Select Files: ' \

@@ -56,13 +56,6 @@ shift $((OPTIND-1))
 infile_nopath="${infile##*/}"
 infile_name="${infile_nopath%.*}"
 
-# file command check input file mime type
-filetype="$(file --mime-type -b "${infile}")"
-
-# image mimetypes
-png_mime='image/png'
-jpg_mime='image/jpeg'
-
 # check if tile is null
 if [ -z "${infile}" ]; then
    : # tile variable not set : = pass
@@ -81,12 +74,6 @@ down="scale=w=-2:h=3*${img_h},crop=w=3*${img_w}/1.2:h=3*${img_h}/1.2:y=(in_h-out
 
 # outfile file recording destination
 outfile_default="${infile_name}-pan-$(date +"%Y-%m-%d-%H-%M-%S").mp4"
-
-# check the files mime type is a image
-case "${filetype}" in
-    ${png_mime}|${jpg_mime});;
-    *) { echo "${infile} ${NOT_MEDIA_FILE_ERR}" && usage; };;
-esac
 
 ### zoom function
 pan_func () {
