@@ -153,34 +153,31 @@ record_aac () {
 
 # image - audio is aac, copy audio stream
 record_img_copy () {
+  dur="$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${audio}")"
   ffmpeg \
   -hide_banner \
   -stats -v panic \
-  -loop 1 \
+  -framerate 1/"${dur}" \
   -i "${infile}" \
   -i "${audio}" \
-  -shortest -fflags shortest -max_interleave_delta 100M \
   -c:a copy \
   -c:v libx264 -crf 18 -profile:v high \
-  -map 0:0 -map 1:0 \
   -r 30 -pix_fmt yuv420p \
-  -shortest \
   -movflags +faststart -f mp4 \
   "${outfile:=${outfile_default}}"
 }
 
 # image - audio isnt aac, encode audio as aac
 record_img_aac () {
+  dur="$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${audio}")"
   ffmpeg \
   -hide_banner \
   -stats -v panic \
-  -loop 1 \
+  -framerate 1/"${dur}" \
   -i "${infile}" \
   -i "${audio}" \
-  -shortest -fflags shortest -max_interleave_delta 100M \
   -c:a "${aac}" \
   -c:v libx264 -crf 18 -profile:v high \
-  -map 0:0 -map 1:0 \
   -r 30 -pix_fmt yuv420p \
   -movflags +faststart -f mp4 \
   "${outfile:=${outfile_default}}"
