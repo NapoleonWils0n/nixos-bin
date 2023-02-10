@@ -16,7 +16,8 @@ REQ_ARG_ERR='requires an argument'
 WRONG_ARGS_ERR='wrong number of arguments passed to script'
 
 # mpd host socket
-host="${HOME}/.config/mpd/socket"
+# MPD_HOST set in ~/.zshenv to "/run/user/1000/mpd/socket"
+host="${MPD_HOST}"
 
 # if script is run arguments pass and check the options with getopts,
 # else display script usage and exit
