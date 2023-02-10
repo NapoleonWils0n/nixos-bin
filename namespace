@@ -1,4 +1,8 @@
 #!/bin/sh
 
+
+ip='/run/current-system/sw/bin/ip'
+doas='/run/wrappers/bin/doas'
+
 # open in namespace
-ip netns exec vpn doas -u djwilcox -- "$@"
+"${ip}" netns exec vpn "${doas}" -u djwilcox -- "$@"
