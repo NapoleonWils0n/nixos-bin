@@ -5,5 +5,10 @@
 # if script is run without arguments exit
 [ $# -gt 0 ] || exit
 
-# transmission add magnet link
-transmission-remote --add "$@"
+
+# check if network namespace exists on nixos
+if [ -d /var/run/netns/vpn ]; then
+    doas namespace transmission-remote --add "$@"
+else
+    transmission-remote --add "$@"
+fi
