@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# stop the transmission systemd service 
+doas systemctl stop transmission
+
+ip='/run/current-system/sw/bin/ip'
+doas='/run/wrappers/bin/doas'
+transmission-daemon="${HOME}/.nix-profile/bin/transmission-daemon"
+
+# open in namespace
+"${ip}" netns exec vpn\
+"${doas}" -u transmission\
+"${transmission-daemon}" -g /var/lib/transmission/.config/transmission-daemon
