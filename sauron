@@ -65,12 +65,23 @@ video() {
     done
 }
 
+
+# streamlink download
+streamlink() {
+    printf "%s\n" "${input}" | \
+    while read -r line
+    do
+      ts streamlink -o "${HOME}/Downloads/{title}-{time}.mkv" "${line}" 1080p,720p 1>/dev/null
+    done
+}
+
 # fzf prompt variables spaces to line up menu options
 audio_ts='audio        - mpd play audio'
 download_ts='download     - yt-dlp download links'
 sponsorblock_ts='sponsorblock - sponsorblock yt-dlp'
 fullscreen_ts='fullscreen   - mpv play fullscreen on second display'
 video_ts='video        - mpv play video on current display'
+streamlink_ts='streamlink   - streamlink download video'
 
 # fzf prompt to specify function to run on links from ytfzf
 menu=$(printf "%s\n" \
@@ -79,6 +90,7 @@ menu=$(printf "%s\n" \
 	      "${sponsorblock_ts}" \
 	      "${fullscreen_ts}" \
 	      "${video_ts}" \
+	      "${streamlink_ts}" \
 	      | fzf --delimiter='\n' --prompt='Pipe links to: ' --info=inline --layout=reverse --no-multi)
 
 # case statement to run function based on fzf prompt output
@@ -88,5 +100,6 @@ case "${menu}" in
    sponsor*)sponsorblock_download ;;
    fullscreen*) fullscreen;;
    video*) video;;
+   streamlink*) streamlink_play;;
    *) exit;;
 esac
