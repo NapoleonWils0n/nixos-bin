@@ -97,7 +97,7 @@ open='open         - open link in browser'
 sponsorblock_ts='sponsorblock - sponsorblock yt-dlp'
 fullscreen_ts='fullscreen   - mpv play fullscreen on second display'
 video_ts='video        - mpv play video on current display'
-streamlink_ts='streamlink   - streamlink download video'
+streamlink_ts='streamlink   - streamlink download'
 
 # fzf prompt to specify function to run on links from ytfzf
 menu=$(printf "%s\n" \
