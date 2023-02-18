@@ -120,6 +120,6 @@ case "${menu}" in
    sponsor*)sponsorblock_download ;;
    fullscreen*) fullscreen;;
    video*) video;;
-   streamlink*) streamlink_play;;
+   streamlink*) streamlink;;
    *) exit;;
 esac
