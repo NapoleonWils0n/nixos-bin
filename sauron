@@ -30,6 +30,7 @@ download() {
     do
       ts \
       yt-dlp \
+      --ignore-config \
       --no-playlist \
       -f 'bestvideo[height<=1080][vcodec!=?vp9]+bestaudio[acodec!=?opus]' \
       -o "$HOME/Downloads/%(title)s.%(ext)s" \
@@ -53,6 +54,7 @@ sponsorblock_download() {
     do
       ts \
       yt-dlp \
+      --ignore-config \
       --no-playlist \
       --sponsorblock-remove all \
       -f 'bestvideo[height<=1080][vcodec!=?vp9]+bestaudio[acodec!=?opus]' \
