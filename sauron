@@ -68,7 +68,7 @@ fullscreen() {
     printf "%s\n" "${input}" | \
     while read -r line
     do
-      ts mpv --no-terminal --fs "${line}" 1>/dev/null 
+      ts mpv --no-terminal --fs --fs-screen=1 "${line}" 1>/dev/null 
     done
 }
 
