@@ -9,12 +9,21 @@
 input=$(printf "%s\n" "$@")
 
 
-# mpd and taskspooler
-audio() {
+# mpv and taskspooler
+video() {
     printf "%s\n" "${input}" | \
     while read -r line
     do
-      ts pinch -i "${line}" 1>/dev/null 
+      ts mpv --no-terminal "${line}" 1>/dev/null
+    done
+}
+
+# mpv fullscreen on second display and taskspooler
+fullscreen() {
+    printf "%s\n" "${input}" | \
+    while read -r line
+    do
+      ts mpv --no-terminal --fs --fs-screen=1 "${line}" 1>/dev/null 
     done
 }
 
@@ -23,8 +32,17 @@ copy() {
     printf "%s\n" "${input}" | xclip -i -selection clipboard 1>/dev/null
 }
 
-# download with yt-dlp
-download() {
+# open link in browser
+open() {
+    printf "%s\n" "${input}" | \
+    while read -r line
+    do
+      xdg-open "${line}" 1>/dev/null 
+    done
+}
+
+# yt-dlp download
+ytdlp() {
     printf "%s\n" "${input}" | \
     while read -r line
     do
@@ -38,12 +56,35 @@ download() {
     done
 }
 
-# open link in browser
-open() {
+# aria2c download
+aria2c() {
     printf "%s\n" "${input}" | \
     while read -r line
     do
-      xdg-open "${line}" 1>/dev/null 
+      ts \
+      yt-dlp \
+      --ignore-config \
+      --no-playlist \
+      -f 'bestvideo[height<=1080][vcodec!=?vp9]+bestaudio[acodec!=?opus]' \
+      --downloader aria2c --downloader-args aria2c:'-c -j 3 -x 3 -s 3 -k 1M' \
+      -o "$HOME/Downloads/%(title)s.%(ext)s" \
+      "${line}" 1>/dev/null
+    done
+}
+
+# ffmpeg download
+ffmpeg() {
+    printf "%s\n" "${input}" | \
+    while read -r line
+    do
+      ts \
+      yt-dlp \
+      --ignore-config \
+      --no-playlist \
+      -f 'bestvideo[height<=1080][vcodec!=?vp9]+bestaudio[acodec!=?opus]' \
+      --downloader ffmpeg --downloader-args ffmpeg:'-hide_banner -stats -v panic' \
+      -o "$HOME/Downloads/%(title)s.%(ext)s" \
+      "${line}" 1>/dev/null
     done
 }
 
@@ -63,24 +104,14 @@ sponsorblock_download() {
     done
 }
 
-# mpv fullscreen on second display and taskspooler
-fullscreen() {
+# mpd and taskspooler
+audio() {
     printf "%s\n" "${input}" | \
     while read -r line
     do
-      ts mpv --no-terminal --fs --fs-screen=1 "${line}" 1>/dev/null 
+      ts pinch -i "${line}" 1>/dev/null 
     done
 }
-
-# mpv and taskspooler
-video() {
-    printf "%s\n" "${input}" | \
-    while read -r line
-    do
-      ts mpv --no-terminal "${line}" 1>/dev/null
-    done
-}
-
 
 # streamlink download
 streamlink() {
@@ -94,7 +125,9 @@ streamlink() {
 # fzf prompt variables spaces to line up menu options
 audio_ts='audio        - mpd play audio'
 copy='copy         - copy url'
-download_ts='download     - yt-dlp download links'
+ytdlp_ts='yt-dlp       - yt-dlp download links'
+aria2c_ts='aria2c       - aria2c download links'
+ffmpeg_ts='ffmpeg       - ffmpeg download links'
 open='open         - open link in browser'
 sponsorblock_ts='sponsorblock - sponsorblock yt-dlp'
 fullscreen_ts='fullscreen   - mpv play fullscreen on second display'
@@ -103,9 +136,11 @@ streamlink_ts='streamlink   - streamlink'
 
 # fzf prompt to specify function to run on links from ytfzf
 menu=$(printf "%s\n" \
-	      "${video_ts}" \
 	      "${fullscreen_ts}" \
-	      "${download_ts}" \
+	      "${video_ts}" \
+	      "${ytdlp_ts}" \
+	      "${aria2c_ts}" \
+	      "${ffmpeg_ts}" \
 	      "${copy}" \
 	      "${open}" \
 	      "${audio_ts}" \
@@ -116,12 +151,14 @@ menu=$(printf "%s\n" \
 # case statement to run function based on fzf prompt output
 case "${menu}" in
    audio*) audio;;
+   aria2c*) aria2c;;
    copy*) copy;;
-   download*) download;;
    open*) open;;
    sponsor*)sponsorblock_download ;;
+   ffmpeg*) ffmpeg;;
    fullscreen*) fullscreen;;
-   video*) video;;
    streamlink*) streamlink;;
+   video*) video;;
+   yt-dlp*) ytdlp;;
    *) exit;;
 esac
