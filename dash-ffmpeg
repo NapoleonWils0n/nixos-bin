@@ -70,6 +70,7 @@ audio_url=$(echo "${url}" | awk 'BEGIN{ RS ="" ; FS ="\n" }{print $2}')
 # ffmpeg join audio and video and stream
 ffmpeg \
 -hide_banner \
+-stats -v panic \
 -re \
 -i "${video_url}" \
 -i "${audio_url}" \
