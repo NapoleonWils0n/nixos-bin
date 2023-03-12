@@ -77,7 +77,7 @@ ffmpeg \
 -c:a copy -c:v copy \
 -tune zerolatency \
 -map 0:0 -map 1:0 \
--f matroska pipe: | mpv - --no-terminal --fs --fs-screen=1
+-f matroska pipe: | mpv - --cache 2048 --no-terminal --fs --fs-screen=1
 }
 
 
