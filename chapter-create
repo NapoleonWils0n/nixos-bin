@@ -61,6 +61,11 @@ shift $((OPTIND-1))
 # output file name
 #output_default="metadata-$(date +"%Y-%m-%d-%H-%M-%S").txt"
 
+
+#===============================================================================
+# sexagesimal function
+#===============================================================================
+
 sexagesimal () {
 total="$(awk 'END { print NR }' < "${input}")"
 awk -F "," '
