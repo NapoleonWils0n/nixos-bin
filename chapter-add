@@ -18,7 +18,7 @@ usage () {
 # display help
 echo "\
 add chapters to a video or audio file with ffmpeg
-$(basename "$0") -i input -m metadata.txt -o output"
+$(basename "$0") -i input -c metadata.txt -o output"
 exit 2
 }
 
@@ -43,11 +43,11 @@ WRONG_ARGS_ERR='wrong number of arguments passed to script'
 # getopts check the options passed to the script
 #===============================================================================
 
-while getopts ':i:m:o:h' opt
+while getopts ':i:c:o:h' opt
 do
   case ${opt} in
      i) input="${OPTARG}";;
-     m) metadata="${OPTARG}";;
+     c) metadata="${OPTARG}";;
      h) usage;;
      o) output="${OPTARG}";;
      \?) usage "${INVALID_OPT_ERR} ${OPTARG}" 1>&2;;
