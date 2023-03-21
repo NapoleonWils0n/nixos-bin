@@ -2,7 +2,7 @@
 
 #===============================================================================
 # chapter-csv
-# convert a csv file into a chapter metadat file for ffmpeg
+# convert a csv file into a chapter metadata file for ffmpeg
 #===============================================================================
 
 # dependencies:
@@ -17,10 +17,8 @@ usage () {
 [ -z "${1}" ] || echo "! ${1}"
 # display help
 echo "\
-$(basename "$0") -i input -o output
-
--i input
--o output"
+convert a csv file into a chapter metadata file for ffmpeg
+$(basename "$0") -i input -o output"
 exit 2
 }
 
