@@ -73,25 +73,22 @@ awk -F "," '
             combined = (t[1] * 3600) + (t[2] * 60) + t[3] 
             milliseconds = (combined * 1000)
           }
-          printf("%d,%s\n"), milliseconds, chapter
-     }' < "${input}" # > output.txt
+         # printf("%d,%s\n"), milliseconds, chapter
+         # if (NR % 2 == 1) {
+         # printf("%d,%s\n"), milliseconds, chapter
+         # }
+     }' < "${input}"
 }
 
-# logic
-# start = current line unless last line
-# end = next start line - 1, unless last line
 
+dev2 () {
+ awk -F "," ' \
+ {
+   end = $1
+ }
+ NR == 1 {print ";FFMETADATA1"} NR > 1 {printf("%s\n%s\n%s%s\n%s%s\n%s%s\n"), "[CHAPTER]", "TIMEBASE=1/1000", "START=", prev, "END=", end, "title=", chapter}; {prev = $1; chapter = $2}' < "${input}" 
+}
 
-#  printf("%s\n%s\n%s%d\n%s%d\n%s%s\n"), "[CHAPTER]", "TIMEBASE=1/1000", "START=", milliseconds, "END=", prev, "title=", chapter
-
-
-# NR == 1 {print ";FFMETADATA1"} NR > 1 {printf("%s\n%s\n%s%s\n%s%s\n%s%s\n"), "[CHAPTER]", "TIMEBASE=1/1000", "START=", milliseconds, "END=", $0-1, "title=", $4}; {prev = $1}' < "${input}"
-# {  printf("%s:%s\n"), milliseconds, title }' < "${input}" # > output.txt
-
-#dev () {
-# awk -F "," ' \
-# NR == 1 {print ";FFMETADATA1"} NR > 1 {printf("%s\n%s\n%s%s\n%s%s\n%s%s\n"), "[CHAPTER]", "TIMEBASE=1/1000", "START=", prev, "END=", $0-1, "title=", $2}; {prev = $1}' < "${input}" 
-#}
 
 
 #===============================================================================
