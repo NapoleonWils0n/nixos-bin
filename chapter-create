@@ -73,10 +73,6 @@ awk -F "," '
             combined = (t[1] * 3600) + (t[2] * 60) + t[3] 
             milliseconds = (combined * 1000)
           }
-         # printf("%d,%s\n"), milliseconds, chapter
-         # if (NR % 2 == 1) {
-         # printf("%d,%s\n"), milliseconds, chapter
-         # }
      }' < "${input}"
 }
 
