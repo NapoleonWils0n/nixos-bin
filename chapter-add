@@ -69,7 +69,7 @@ input_name="${input_nopath%.*}"
 input_ext="${input##*.}"
 
 # output file name
-output_default="${input_name}-metadata-$(date +"%Y-%m-%d-%H-%M-%S").${input_ext}"
+output_default="${input_name}-metadata.${input_ext}"
 
 
 #===============================================================================
