@@ -73,7 +73,6 @@ output_default="${input_name}-metadata.txt"
 #===============================================================================
 
 sexagesimal () {
-total="$(awk 'END { print NR }' < "${input}")"
 awk -F "," '
         {
           time = $1
@@ -85,10 +84,11 @@ awk -F "," '
           }
           printf("%d,%s\n"), milliseconds, chapter
      }' < "${input}" \
-| awk -v records="$total" -F "," ' \
- { if (FNR < records) end = $1-1; else end = $1 }
+| awk -F "," ' \
+ { end = $1 }
  NR == 1 {print ";FFMETADATA1"} NR > 1 {printf("%s\n%s\n%s%s\n%s%s\n%s%s\n"), "[CHAPTER]", "TIMEBASE=1/1000", "START=", prev, "END=", end, "title=", chapter}; {prev = $1; chapter = $2}' > "${output:=${output_default}}"
 }
+
 
 #===============================================================================
 # run function
