@@ -65,7 +65,7 @@ input_nopath="${input##*/}"
 input_name="${input_nopath%.*}"
 
 # output file name
-output_default="${input_name}-timestamps.txt"
+output_default="${input_name}-timestamps.csv"
 
 
 #===============================================================================
