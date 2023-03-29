@@ -87,9 +87,8 @@ awk 'BEGIN { FS="\t"; OFS="," } {
 }' < "${input}" \
 | awk -F "," '
        NR==1 {
-          line=$0;
-          match(line, /\[[A-Za-z]*\]/);
-          id=substr(line, RSTART + 1, RLENGTH - 2)
+          match($0, /\[[A-Za-z0-9]*\]/);
+          id=substr($0, RSTART + 1, RLENGTH - 2)
         }
         NR>=2 {
             time = $1
