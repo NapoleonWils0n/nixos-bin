@@ -18,7 +18,7 @@ usage () {
 # display help
 echo "\
 calculate sexagesimal duration by subtacting end time from start time
-$(basename "$0") -s 00:10:00 -e 00:25:00"
+$(basename "$0") -s 00:00:00 -e 00:00:00"
 exit 2
 }
 
