@@ -84,7 +84,7 @@ ffprobe -v panic -hide_banner \
             sexagesimal = t[1]
           }
           printf("%s,%s\n"), sexagesimal, chapter
-          }' > "${output:=${output_default}}"
+}' > "${output:=${output_default}}"
 }
 
 
