@@ -10,6 +10,7 @@ rsync -aAXvz --ignore-errors --delete --progress \
 --exclude .nix-defexpr \
 --exclude .nix-profile \
 --exclude .cache \
+--exclude .config/chromium \
 --exclude .kodi \
 --exclude .local \
 --exclude .mozilla \
