@@ -2,6 +2,7 @@
 
 # backup home to usb
 rsync -aAXvz --ignore-errors --delete --progress \
+--exclude bin \
 --exclude Downloads \
 --exclude Music \
 --exclude Videos \
@@ -9,6 +10,11 @@ rsync -aAXvz --ignore-errors --delete --progress \
 --exclude .nix-defexpr \
 --exclude .nix-profile \
 --exclude .cache \
---exclude .dbus \
+--exclude .kodi \
+--exclude .local \
 --exclude .mozilla \
+--exclude .nv \
+--exclude .nvidia-settings-rc \
+--exclude .pki \
+--exclude .ssh \
 /home/djwilcox /var/run/media/djwilcox/backup
