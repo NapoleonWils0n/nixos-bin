@@ -5,7 +5,7 @@ rsync -aAXvz --ignore-errors --delete --progress \
 --exclude bin \
 --exclude Downloads \
 --exclude Music \
---exclude Videos \
+--exclude torrents \
 --exclude .nix-channels \
 --exclude .nix-defexpr \
 --exclude .nix-profile \
