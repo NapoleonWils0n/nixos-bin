@@ -61,12 +61,14 @@ shift $((OPTIND-1))
 
 # warp cursor left
 left () {
-  wlrctl pointer move -1920 && wlrctl pointer click
+    wlrctl pointer move -1920
+    wlrctl pointer click
 }
 
 # warp cursor right
 right () {
-  wlrctl pointer move 1920 && wlrctl pointer click
+    wlrctl pointer move 1920
+    wlrctl pointer click
 }
 
 
