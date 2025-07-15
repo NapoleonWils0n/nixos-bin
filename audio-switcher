@@ -1,12 +1,13 @@
 #!/bin/sh
 
 #===============================================================================
-# warp-cursor
-# warp cursor left and right
+# audio-switcher
+# switch audio input and ouput devices
 #===============================================================================
 
 # dependencies:
-# wlrctl
+# wpctl
+
 
 #===============================================================================
 # script usage
@@ -17,8 +18,7 @@ usage () {
 [ -z "${1}" ] || echo "! ${1}"
 # display help
 echo "\
-$(basename "$0") -i left|right)
--i left|right"
+$(basename "$0") -i mic|yeti -o laptop|soundsticks"
 exit 2
 }
 
@@ -36,17 +36,19 @@ WRONG_ARGS_ERR='wrong number of arguments passed to script'
 # check the number of arguments passed to the script
 #===============================================================================
 
-[ $# -gt 0 ] || usage "${WRONG_ARGS_ERR}"
+[ $# -ne 0 ] || usage "${WRONG_ARGS_ERR}"
+
 
 
 #===============================================================================
 # getopts check the options passed to the script
 #===============================================================================
 
-while getopts ':i:h' opt
+while getopts ':i:o:h' opt
 do
   case ${opt} in
      i) input="${OPTARG}";;
+     o) output="${OPTARG}";;
      h) usage;;
      \?) usage "${INVALID_OPT_ERR} ${OPTARG}" 1>&2;;
      :) usage "${INVALID_OPT_ERR} ${OPTARG} ${REQ_ARG_ERR}" 1>&2;;
@@ -59,23 +61,57 @@ shift $((OPTIND-1))
 # functions
 #===============================================================================
 
-# warp cursor left
-left () {
-    wlrctl pointer move -1920
-}
 
-# warp cursor right
-right () {
-    wlrctl pointer move 1920
+#===============================================================================
+# audio source - input
+#===============================================================================
+
+audiosource () {
+wpctl set-default-source $(wpctl status | awk '
+  /Sources:/ { in_sources = 1; next }
+  /Filters:/ { in_sources = 0 } # Or /Streams:/ if Filters is not the next section
+  in_sources && $0 ~ /'"${1}"'/ {
+    match($0, /[0-9]+/); # Find the first sequence of digits
+    print substr($0, RSTART, RLENGTH); # Print the matched digits
+    exit;
+  }
+')
 }
 
 
 #===============================================================================
-# warp cursor left or right
+# audio sink - output
+#===============================================================================
+
+audiosink () {
+wpctl set-default $(wpctl status | awk '
+  /Sinks:/ { in_sinks = 1; next }
+  /Sources:/ { in_sinks = 0 }
+  in_sinks && $0 ~ /'"${1}"'/ {
+    match($0, /[0-9]+/); # Find the first sequence of digits
+    print substr($0, RSTART, RLENGTH); # Print the matched digits
+    exit;
+  }
+')
+}
+
+
+#===============================================================================
+# audiosource
 #===============================================================================
 
 case "${input}" in
-    left) left;; 
-    right) right;;
-    *) usage;;
+    mic) audiosource mic;; 
+    yeti) audiosource yeti;;
+esac
+
+
+#===============================================================================
+# audiosink
+#===============================================================================
+
+
+case "${output}" in
+    laptop) audiosink laptop;; 
+    speakers) audiosink speakers;;
 esac
