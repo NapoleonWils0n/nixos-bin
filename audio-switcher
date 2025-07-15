@@ -18,7 +18,7 @@ usage () {
 [ -z "${1}" ] || echo "! ${1}"
 # display help
 echo "\
-$(basename "$0") -i mic|yeti -o laptop|soundsticks"
+$(basename "$0") -i mic|yeti -o laptop|speakers"
 exit 2
 }
 
