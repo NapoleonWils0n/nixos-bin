@@ -39,7 +39,6 @@ WRONG_ARGS_ERR='wrong number of arguments passed to script'
 [ $# -ne 0 ] || usage "${WRONG_ARGS_ERR}"
 
 
-
 #===============================================================================
 # getopts check the options passed to the script
 #===============================================================================
@@ -61,21 +60,40 @@ shift $((OPTIND-1))
 # functions
 #===============================================================================
 
+# Helper function to get the device ID
+get_device_id() {
+  local device_type="$1" # "Sinks" or "Sources"
+  local device_name="$2"
+  local end_section="$3" # e.g., "Sources", "Filters", or "Streams"
 
+  # Use double quotes for the awk script to allow shell variable expansion
+  # Escape awk's own variables like $0 with a backslash
+  wpctl status | awk "
+    /${device_type}:/ { in_section = 1; next }
+    /${end_section}:/ { in_section = 0 }
+    in_section && \$0 ~ /${device_name}/ {
+      match(\$0, /[0-9]+/);
+      print substr(\$0, RSTART, RLENGTH);
+      exit;
+    }
+  "
+}
 #===============================================================================
 # audio source - input
 #===============================================================================
 
 audiosource () {
-wpctl set-default-source $(wpctl status | awk '
-  /Sources:/ { in_sources = 1; next }
-  /Filters:/ { in_sources = 0 } # Or /Streams:/ if Filters is not the next section
-  in_sources && $0 ~ /'"${1}"'/ {
-    match($0, /[0-9]+/); # Find the first sequence of digits
-    print substr($0, RSTART, RLENGTH); # Print the matched digits
-    exit;
-  }
-')
+  local id=$(get_device_id "Sources" "${1}" "Filters") # Use "Filters" as the common end boundary for Sources
+  if [ -z "${id}" ]; then
+    echo "Error: Could not find ID for source '${1}'." >&2
+    return 1 # Indicate failure
+  fi
+  wpctl set-default-source "${id}"
+  # Check if wpctl command was successful
+  if [ $? -ne 0 ]; then
+      echo "Error: Failed to set default source to '${1}' (ID: ${id})." >&2
+      return 1
+  fi
 }
 
 
@@ -84,34 +102,36 @@ wpctl set-default-source $(wpctl status | awk '
 #===============================================================================
 
 audiosink () {
-wpctl set-default $(wpctl status | awk '
-  /Sinks:/ { in_sinks = 1; next }
-  /Sources:/ { in_sinks = 0 }
-  in_sinks && $0 ~ /'"${1}"'/ {
-    match($0, /[0-9]+/); # Find the first sequence of digits
-    print substr($0, RSTART, RLENGTH); # Print the matched digits
-    exit;
-  }
-')
+  local id=$(get_device_id "Sinks" "${1}" "Sources") # Use "Sources" as the common end boundary for Sinks
+  if [ -z "${id}" ]; then
+    echo "Error: Could not find ID for sink '${1}'." >&2
+    return 1 # Indicate failure
+  fi
+  wpctl set-default "${id}"
+  # Check if wpctl command was successful
+  if [ $? -ne 0 ]; then
+      echo "Error: Failed to set default sink to '${1}' (ID: ${id})." >&2
+      return 1
+  fi
 }
 
 
 #===============================================================================
-# audiosource
+# Main logic to call audiosource/audiosink based on arguments
 #===============================================================================
 
-case "${input}" in
-    mic) audiosource mic;; 
-    yeti) audiosource yeti;;
-esac
+if [ -n "${input}" ]; then
+    case "${input}" in
+        mic) audiosource mic;;
+        yeti) audiosource yeti;;
+        *) usage "Invalid input device: ${input}";;
+    esac
+fi
 
-
-#===============================================================================
-# audiosink
-#===============================================================================
-
-
-case "${output}" in
-    laptop) audiosink laptop;; 
-    speakers) audiosink speakers;;
-esac
+if [ -n "${output}" ]; then
+    case "${output}" in
+        laptop) audiosink laptop;;
+        speakers) audiosink speakers;;
+        *) usage "Invalid output device: ${output}";;
+    esac
+fi
