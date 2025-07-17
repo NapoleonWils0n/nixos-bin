@@ -1,66 +1,60 @@
 #!/bin/sh
 
+# Explicitly set PATH to include common NixOS binary paths.
+export PATH="/home/djwilcox/.nix-profile/bin:/run/current-system/sw/bin:${PATH}"
+
+if [ "$XDG_CURRENT_DESKTOP" = "GNOME" ]; then
+    echo "$(date): Running in Gnome session. Exiting status-bar script." >> "/tmp/status-bar-debug.log"
+    exit 0
+fi
+
 # --- Configuration ---
 POLL_INTERVAL=1 # seconds
-TIME_UPDATE_FREQ=60 # seconds
+# TIME_UPDATE_FREQ=60 # No longer strictly needed for time, but keep if other elements need less frequent updates
 
 # --- Initial Status Values ---
-CURRENT_TIME=""
+CURRENT_TIME="" # Will be updated in the loop
 CURRENT_VOLUME=""
-VOLUME_ICON="🔊" # Default volume icon, will change to 🔇 if muted
-LAST_TIME_UPDATE=$(date +%s)
+VOLUME_ICON="🔊"
+# LAST_TIME_UPDATE=$(date +%s) # No longer needed for time updates at every poll
 
 # --- Function to update volume ---
 update_volume() {
     if ! command -v wpctl > /dev/null; then
         CURRENT_VOLUME="wpctl N/A"
-        VOLUME_ICON="❓" # Use a different icon for missing wpctl, e.g., a question mark
+        VOLUME_ICON="❓"
         return
     fi
-
     VOLUME_RAW=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '/Volume:/ { printf("%s", $2) }')
     IS_MUTED=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '/Volume:/ { print $3 }')
-
-    # Calculate percentage regardless of mute status
     local calculated_percentage="N/A"
     if [ -n "$VOLUME_RAW" ]; then
-        calculated_percentage=$(printf "%.0f" "$(echo "$VOLUME_RAW * 100" | bc -l)")
+        calculated_percentage=$(printf "%.0f" "$(echo "$VOLUME_RAW * 100" | bc -l 2>/dev/null)")
     fi
-
-    # Set the icon based on mute status
     if [ "$IS_MUTED" = "[MUTED]" ]; then
-        VOLUME_ICON="🔇" # Muted icon
+        VOLUME_ICON="🔇"
     else
-        VOLUME_ICON="🔊" # Unmuted icon
+        VOLUME_ICON="🔊"
     fi
-
-    # Always show the percentage, even if muted
     CURRENT_VOLUME="${calculated_percentage}%"
 }
 
 # --- Function to display the bar content ---
 display_bar() {
-    # Added spaces around the pipe for better readability
-    echo "[${VOLUME_ICON}${CURRENT_VOLUME} | ${CURRENT_TIME}]"
+    echo "${VOLUME_ICON}${CURRENT_VOLUME} | ${CURRENT_TIME}"
 }
 
 # --- Main Logic ---
-
-# Perform initial updates
+# Initial updates (optional, will be updated in loop anyway)
 update_volume
-CURRENT_TIME=$(date +"%R")
-display_bar
+# CURRENT_TIME=$(date +"%R") # This line will now be inside the loop for constant updates
 
-# Main loop (polling-based)
+# Main loop, piping its output directly to dwlb
 while true; do
     update_volume
-
-    CURRENT_TIMESTAMP=$(date +%s)
-    if [ $((CURRENT_TIMESTAMP - LAST_TIME_UPDATE)) -ge "$TIME_UPDATE_FREQ" ]; then
-        CURRENT_TIME=$(date +"%R")
-        LAST_TIME_UPDATE=$CURRENT_TIMESTAMP
-    fi
+    # Always update the time with every poll
+    CURRENT_TIME=$(date +"%R") # <--- MOVED THIS LINE HERE
 
     display_bar
     sleep "$POLL_INTERVAL"
-done
+done | dwlb -font "monospace:size=16" -status-stdin all
