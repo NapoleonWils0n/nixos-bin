@@ -21,7 +21,7 @@ fi
 #===============================================================================
 
 # image for wallpaper
-image="${HOME}/Pictures/wallpaper/akira-wallpaper.png"
+image="/home/djwilcox/Pictures/wallpaper/akira-wallpaper.png"
 
 # run wbg and set the wallpaper
 wbg "${image}"
