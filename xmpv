@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # task-spooler mpv play clipboard
-tsp mpv --fs --fs-screen=1 "$(xclip -o)" 1>/dev/null
+ts mpv --fs --fs-screen-name=DP-3 "$(wl-paste -n)" 1>/dev/null

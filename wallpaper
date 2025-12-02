@@ -12,8 +12,8 @@ export PATH="/home/djwilcox/.nix-profile/bin:/run/current-system/sw/bin:${PATH}"
 # check if we are running Gnome and then exit
 #===============================================================================
 
-if [ "$XDG_CURRENT_DESKTOP" = "GNOME" ]; then
-    echo "$(date): Running in Gnome session. Exiting status-bar script." >> "/tmp/status-bar-debug.log"
+if [ "$XDG_CURRENT_DESKTOP" = "COSMIC" ]; then
+    echo "$(date): Running in COSMIC session. Exiting status-bar script." >> "/tmp/status-bar-debug.log"
     exit 0
 fi
 
