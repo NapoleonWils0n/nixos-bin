@@ -12,6 +12,7 @@ if mountpoint -q "$BACKUP_DIR"; then
     --exclude Downloads \
     --exclude Music \
     --exclude torrents \
+    --exclude libvirt \
     --exclude .nix-channels \
     --exclude .nix-defexpr \
     --exclude .nix-profile \
