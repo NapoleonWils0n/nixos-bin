@@ -4,5 +4,8 @@
 # nvenc fix for obs studio with LD_LIBRARY_PATH and DBUS_SESSION_BUS_ADDRESS for xdg
 #===================================================================================
 
+# Exit immediately if the HOST variable is not pollux, Dell xps 15 with nvidia
+[ "$(hostname)" != "pollux" ] && exit 0
+
 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
 LD_LIBRARY_PATH=/run/opengl-driver/lib:$LD_LIBRARY_PATH exec obs
