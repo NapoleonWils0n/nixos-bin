@@ -44,4 +44,7 @@ WRONG_ARGS_ERR='wrong number of arguments passed to script'
 # namespace
 #===============================================================================
 
-ip netns exec vpn doas -u djwilcox -- "$@"
+# preserves the name of the user who initiated the command
+# in the $DOAS_USER environment variable.
+
+ip netns exec vpn doas -u "${DOAS_USER}" -- "$@"
