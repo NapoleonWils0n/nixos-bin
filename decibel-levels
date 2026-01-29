@@ -89,8 +89,8 @@ decibel() {
 
       # Suggestion logic: Threshold should be ~12dB below average voice
       printf "\n--- DeepFilter Suggestion ---\n"
-      printf "min-db-thresh: --min-db-thresh %.0f\n", r_db - 12
       printf "atten-lim-db:  --atten-lim-db: %d\n", suggested_atten
+      printf "min-db-thresh: --min-db-thresh %.0f\n", r_db - 12
     }
   '
 }
