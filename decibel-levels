@@ -1,0 +1,103 @@
+#!/bin/sh
+
+#===============================================================================
+# sox calculate decibel levels for deep-filternet
+#===============================================================================
+
+# dependencies:
+# sox, awk
+
+#===============================================================================
+# script usage
+#===============================================================================
+
+usage () {
+# if argument passed to function echo it
+[ -z "${1}" ] || echo "! ${1}"
+# display help
+echo "\
+$(basename "$0") -i input.wav"
+exit 2
+}
+
+
+#===============================================================================
+# error messages
+#===============================================================================
+
+INVALID_OPT_ERR='Invalid option:'
+REQ_ARG_ERR='requires an argument'
+WRONG_ARGS_ERR='wrong number of arguments passed to script'
+
+
+#===============================================================================
+# check the number of arguments passed to the script
+#===============================================================================
+
+[ $# -gt 0 ] || usage "${WRONG_ARGS_ERR}"
+
+
+#===============================================================================
+# getopts check the options passed to the script
+#===============================================================================
+
+while getopts ':i:h' opt
+do
+  case ${opt} in
+     i) input="${OPTARG}";;
+     h) usage;;
+     \?) usage "${INVALID_OPT_ERR} ${OPTARG}" 1>&2;;
+     :) usage "${INVALID_OPT_ERR} ${OPTARG} ${REQ_ARG_ERR}" 1>&2;;
+  esac
+done
+shift $((OPTIND-1))
+
+
+#===============================================================================
+# decibel function
+#===============================================================================
+
+decibel() {
+  # Redirect stderr (2) to stdout (1) so awk can read it
+  sox "${input}" -n stat 2>&1 | awk '
+    # Function to calculate dB from amplitude
+    function db(amp) {
+      if (amp <= 0) return "-inf";
+      return 20 * (log(amp) / log(10));
+    }
+    
+    # Absolute value helper
+    function abs(v) { return v < 0 ? -v : v }
+
+    # Capture the specific fields
+    /Maximum amplitude:/ { max = $NF }
+    /Minimum amplitude:/ { min = $NF }
+    /RMS[[:space:]]+amplitude:/ { rms = $NF }
+
+    END {
+      # Use the larger absolute value for the true Peak
+      peak_amp = abs(max) > abs(min) ? abs(max) : abs(min);
+      
+      printf "\n--- Decibel Statistics ---\n"
+      printf "Peak Level:  %.2f dB\n", db(peak_amp)
+      printf "RMS Level:   %.2f dB (Average)\n", db(rms)
+
+      # Logic for Attenuation Limit
+      # If RMS is very high (loud), you need more attenuation
+      # If RMS is low (quiet), high attenuation sounds robotic
+      suggested_atten = (r_db > -20) ? 15 : 10;
+
+      # Suggestion logic: Threshold should be ~12dB below average voice
+      printf "\n--- DeepFilter Suggestion ---\n"
+      printf "min-db-thresh: --min-db-thresh %.0f\n", r_db - 12
+      printf "atten-lim-db:  --atten-lim-db: %d\n", suggested_atten
+    }
+  '
+}
+
+
+#===============================================================================
+# run decibel function
+#===============================================================================
+
+decibel
