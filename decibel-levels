@@ -58,42 +58,47 @@ shift $((OPTIND-1))
 #===============================================================================
 
 decibel() {
-  # Redirect stderr (2) to stdout (1) so awk can read it
-  sox "${input}" -n stat 2>&1 | awk '
-    # Function to calculate dB from amplitude
-    function db(amp) {
-      if (amp <= 0) return "-inf";
-      return 20 * (log(amp) / log(10));
+  # 2>&1 is vital because sox prints stats to stderr
+  sox "${input}" -n stats 2>&1 | awk -v file="${input}" '
+    # Function to grab the first number (Peak/RMS/Trough) on the line
+    function get_db(str) {
+        for (i=1; i<=NF; i++) {
+            if ($i ~ /^-?[0-9.]+$/) return $i
+        }
+        return 0
     }
-    
-    # Absolute value helper
-    function abs(v) { return v < 0 ? -v : v }
 
-    # Capture the specific fields
-    /Maximum amplitude:/ { max = $NF }
-    /Minimum amplitude:/ { min = $NF }
-    /RMS[[:space:]]+amplitude:/ { rms = $NF }
+    /Pk lev dB/  { peak = get_db($0) }
+    /RMS lev dB/ { rms = get_db($0) }
+    /RMS Tr dB/  { trough = get_db($0) }
 
     END {
-      # Use the larger absolute value for the true Peak
-      peak_amp = abs(max) > abs(min) ? abs(max) : abs(min);
-      
+      # If rms is still 0, something went wrong with the sox pipe
+      if (rms == 0) {
+        print "Error: Could not extract stats. Ensure sox is installed and the file is a valid audio file."
+        exit 1
+      }
+
+      # Calculations
+      thresh = rms - 12;
+      gap = rms - trough;
+      atten = (gap > 30) ? 15 : 10;
+
       printf "\n--- Decibel Statistics ---\n"
-      printf "Peak Level:  %.2f dB\n", db(peak_amp)
-      printf "RMS Level:   %.2f dB (Average)\n", db(rms)
+      printf "File:          %s\n", file
+      printf "Peak Level:    %s dB\n", peak
+      printf "RMS Level:     %s dB (Average)\n", rms
+      printf "Noise Floor:   %s dB (Trough)\n", trough
+      printf "Signal Gap:    %.2f dB\n\n", gap
 
-      # Logic for Attenuation Limit
-      # If RMS is very high (loud), you need more attenuation
-      # If RMS is low (quiet), high attenuation sounds robotic
-      suggested_atten = (r_db > -20) ? 15 : 10;
-
-      # Suggestion logic: Threshold should be ~12dB below average voice
-      printf "\n--- DeepFilter Suggestion ---\n"
-      printf "atten-lim-db:  --atten-lim-db: %d\n", suggested_atten
-      printf "min-db-thresh: --min-db-thresh %.0f\n", r_db - 12
+      # 2. Deep-filter settings Section
+      printf "--- deep-filter settings ---\n"
+      printf "atten-lim-db:  --atten-lim-db %d\n", atten
+      printf "min-db-thresh: --min-db-thresh %.0f\n", thresh
     }
   '
 }
+
 
 
 #===============================================================================
