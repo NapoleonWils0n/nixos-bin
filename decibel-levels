@@ -90,11 +90,6 @@ decibel() {
       printf "RMS Level:     %s dB (Average)\n", rms
       printf "Noise Floor:   %s dB (Trough)\n", trough
       printf "Signal Gap:    %.2f dB\n\n", gap
-
-      # 2. Deep-filter settings Section
-      printf "--- deep-filter settings ---\n"
-      printf "atten-lim-db:  --atten-lim-db %d\n", atten
-      printf "min-db-thresh: --min-db-thresh %.0f\n", thresh
     }
   '
 }
