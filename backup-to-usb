@@ -8,7 +8,6 @@ if mountpoint -q "$BACKUP_DIR"; then
     echo "Backup directory '$BACKUP_DIR' is mounted. Starting backup..."
     # backup home to usb
     rsync -aAXvz --ignore-errors --delete --progress \
-    --exclude bin \
     --exclude Downloads \
     --exclude Music \
     --exclude torrents \
