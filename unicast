@@ -23,7 +23,9 @@ usage () {
 
 one_stream () {
   ffmpeg \
-  -hide_banner -stats -v panic -re \
+  -hide_banner \
+  -stats -v panic \
+  -re \
   -i "${url}" \
   ${v_params:-"-c:v copy"} ${a_params:-"-c:a copy"} \
   -tune zerolatency -listen 1 \
@@ -35,7 +37,9 @@ two_streams () {
   audio_url=$(echo "${url}" | awk 'NR==2')
 
   ffmpeg \
-  -hide_banner -stats -v panic -re \
+  -hide_banner \
+  -stats -v panic \
+  -re \
   -i "${video_url}" -i "${audio_url}" \
   ${v_params:-"-c:v copy"} ${a_params:-"-c:a copy"} \
   -tune zerolatency -map 0:0 -map 1:0 \
