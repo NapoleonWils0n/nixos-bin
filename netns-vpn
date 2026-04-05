@@ -10,9 +10,26 @@ up() {
   
   # create network namespace
   ip netns add vpn || true
-  
+
   # bring up loop device
   ip netns exec vpn ip link set dev lo up
+
+  # --- DNS BRIDGE CONFIGURATION ---
+  # Create a virtual ethernet pair to link the namespace to the host
+  ip link add veth-host type veth peer name veth-vpn || true
+  ip link set veth-vpn netns vpn
+  
+  # Set up the host side of the bridge
+  ip addr add 10.200.1.10/24 dev veth-host
+  ip link set veth-host up
+  
+  # Set up the namespace side of the bridge
+  ip netns exec vpn ip addr add 10.200.1.2/24 dev veth-vpn
+  ip netns exec vpn ip link set veth-vpn up
+
+  # Force the namespace to use the host's dummy0 IP for DNS
+  mkdir -p /etc/netns/vpn
+  echo "nameserver 10.200.1.1" > /etc/netns/vpn/resolv.conf
   
   # move VPN tunnel to netns
   ip link set dev "${1}" up netns vpn mtu "${2}"
@@ -34,6 +51,10 @@ up() {
 down() {
   # Set PATH to include NixOS /bin directory for common commands
   PATH="/run/current-system/sw/bin:${PATH}"
+
+  # Clean up the virtual link before deleting the namespace
+  ip link delete veth-host 2>/dev/null || true
+
   ip netns delete vpn
   
   true
